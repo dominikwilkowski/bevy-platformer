@@ -31,12 +31,12 @@ fn main() {
             }),
             ..Default::default()
         }))
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(200.0))
-        .add_plugin(RapierDebugRenderPlugin::default())
-        .add_plugin(PlatformsPlugin)
-        .add_plugin(PlayerPlugin)
-        .add_plugin(AnimationPlugin)
-        .add_startup_system(setup)
+        .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(200.0))
+        .add_plugins(RapierDebugRenderPlugin::default())
+        .add_plugins(PlatformsPlugin)
+        .add_plugins(PlayerPlugin)
+        .add_plugins(AnimationPlugin)
+        .add_systems(Startup, setup)
         .run();
 }
 
