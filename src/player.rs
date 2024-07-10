@@ -10,8 +10,8 @@ const PLAYER_VELOCITY_Y: f32 = 850.0;
 
 const MAX_JUMP_HEIGHT: f32 = 230.0;
 
-const SPRITESHEET_COLS: usize = 7;
-const SPRITESHEET_ROWS: usize = 8;
+const SPRITESHEET_COLS: u32 = 7;
+const SPRITESHEET_ROWS: u32 = 8;
 
 const SPRITE_TILE_WIDTH: f32 = 128.0;
 const SPRITE_TILE_HEIGHT: f32 = 256.0;
@@ -55,7 +55,7 @@ fn setup(
 ) {
     let image_handle: Handle<Image> = server.load("spritesheets/spritesheet_players.png");
     let texture_atlas = TextureAtlasLayout::from_grid(
-        Vec2::new(SPRITE_TILE_WIDTH, SPRITE_TILE_HEIGHT),
+        UVec2::new(SPRITE_TILE_WIDTH as u32, SPRITE_TILE_HEIGHT as u32),
         SPRITESHEET_COLS,
         SPRITESHEET_ROWS,
         None,
@@ -64,24 +64,27 @@ fn setup(
     let atlas_handle = atlases.add(texture_atlas);
 
     commands
-        .spawn(SpriteSheetBundle {
-            sprite: Sprite::default(),
-            atlas: TextureAtlas {
+        .spawn((
+            SpriteBundle {
+                sprite: Sprite::default(),
+
+                texture: image_handle,
+                transform: Transform {
+                    translation: Vec3::new(WINDOW_LEFT_X + 100.0, WINDOW_BOTTOM_Y + 300.0, 0.0),
+                    scale: Vec3::new(
+                        SPRITE_RENDER_WIDTH / SPRITE_TILE_WIDTH,
+                        SPRITE_RENDER_HEIGHT / SPRITE_TILE_HEIGHT,
+                        1.0,
+                    ),
+                    ..default()
+                },
+                ..default()
+            },
+            TextureAtlas {
                 layout: atlas_handle,
                 index: SPRITE_IDX_STAND,
             },
-            texture: image_handle,
-            transform: Transform {
-                translation: Vec3::new(WINDOW_LEFT_X + 100.0, WINDOW_BOTTOM_Y + 300.0, 0.0),
-                scale: Vec3::new(
-                    SPRITE_RENDER_WIDTH / SPRITE_TILE_WIDTH,
-                    SPRITE_RENDER_HEIGHT / SPRITE_TILE_HEIGHT,
-                    1.0,
-                ),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
+        ))
         .insert(RigidBody::KinematicPositionBased)
         .insert(Collider::cuboid(
             SPRITE_TILE_WIDTH / 2.0,
@@ -117,6 +120,7 @@ fn movement(
 #[derive(Component)]
 struct Jump(f32);
 
+#[allow(clippy::type_complexity)]
 fn jump(
     input: Res<ButtonInput<KeyCode>>,
     mut commands: Commands,
